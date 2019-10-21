@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29411.108
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cheese-v2", "cheese-v2\cheese-v2.csproj", "{6704F52F-66D6-4097-A704-D82C0634D98D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6704F52F-66D6-4097-A704-D82C0634D98D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6704F52F-66D6-4097-A704-D82C0634D98D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6704F52F-66D6-4097-A704-D82C0634D98D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6704F52F-66D6-4097-A704-D82C0634D98D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {70E36C4C-B485-4B02-8476-9DA52C970B04}
+	EndGlobalSection
+EndGlobal
