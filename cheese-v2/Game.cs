@@ -48,9 +48,9 @@ namespace cheese_v2
 				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 				{ 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 				{ 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1},
-				{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-				{ 1, 4, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-				{ 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+				{ 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 0, 1},
+				{ 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+				{ 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
 				{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1},
 				{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1},
 				{ 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1},
@@ -155,77 +155,79 @@ namespace cheese_v2
 		}
 		private void move(Object mouse)
 		{
-			bool steps;
-			while (mouse.X == cheese.X && mouse.Y == cheese.Y)
+			var results = checkAround(mouse);
+			//check if found cheese
+			if (results.Item3 == 2)
 			{
-				var results = checkAround(mouse);
-				//check if found cheese
-				if (results.Item3 == 2)
+				gameOver = true;
+			}
+			else if (results.Item2 != 3)
+			{
+				foreach(Direction direction in directions)
 				{
-					gameOver = true;
-				}
-				else if (results.Item2 != 3)
-				{
-					foreach(Direction direction in directions)
+					if (direction != mouse.BackDirection)
 					{
-						if (direction != mouse.BackDirection)
+						if (mouse.X <= cheese.X && mouse.Y <= cheese.Y)
 						{
-							if (mouse.X < cheese.X && mouse.Y < cheese.Y)
-							{
-								if (step(mouse, Direction.Down))
-									return;
-								else if (step(mouse, Direction.Right))
-									return;
+							if (step(mouse, Direction.Down))
+								return;
+							else if (step(mouse, Direction.Right))
+								return;
 
-							}
-							else if (mouse.X > cheese.X && mouse.Y < cheese.Y)
-							{
+						}
+						else if (mouse.X >= cheese.X && mouse.Y <= cheese.Y)
+						{
 
-							}
-							else if (mouse.X < cheese.X && mouse.Y > cheese.Y)
-							{
+							if (step(mouse, Direction.Up))
+								return;
+							else if (step(mouse, Direction.Right))
+								return;
+						}
+						else if (mouse.X <= cheese.X && mouse.Y >= cheese.Y)
+						{
 
-							}
-							else if (mouse.X > cheese.X && mouse.Y > cheese.Y)
-							{
+							if (step(mouse, Direction.Down))
+								return;
+							else if (step(mouse, Direction.Left))
+								return;
+						}
+						else if (mouse.X >= cheese.X && mouse.Y >= cheese.Y)
+						{
 
-							}
+							if (step(mouse, Direction.Up))
+								return;
+							else if (step(mouse, Direction.Left))
+								return;
 						}
 					}
-
-			/*		if (mouse.X < cheese.X && mouse.Y < cheese.Y && mouse.BackDirection != )
-					{
-						step = step(mouse, )
-					}
-					else if (mouse.X > cheese.X && mouse.Y < cheese.Y)
-					{
-
-					}
-					else if (mouse.X < cheese.X && mouse.Y > cheese.Y)
-					{
-
-					}
-					else if (mouse.X > cheese.X && mouse.Y > cheese.Y)
-					{
-
-					}*/
 				}
-				else if (checkAround(mouse, Direction.Up) == 0)
-					move(mouse, Direction.Up);
-				else if (checkAround(mouse, Direction.Down) == 0)
-					move(mouse, Direction.Down);
-				else if (checkAround(mouse, Direction.Left) == 0)
-					move(mouse, Direction.Left);
-				else if (checkAround(mouse, Direction.Right) == 0)
-					move(mouse, Direction.Right);
+
+		/*		if (mouse.X < cheese.X && mouse.Y < cheese.Y && mouse.BackDirection != )
+				{
+					step = step(mouse, )
+				}
+				else if (mouse.X > cheese.X && mouse.Y < cheese.Y)
+				{
+
+				}
+				else if (mouse.X < cheese.X && mouse.Y > cheese.Y)
+				{
+
+				}
+				else if (mouse.X > cheese.X && mouse.Y > cheese.Y)
+				{
+
+				}*/
 			}
+			
 		}
+		//duvar kontrolu burda yapılacak
 		private bool step(Object mouse, Direction direction)
 		{
 			int newX = mouse.X, newY = mouse.Y;
 			Direction backDirection;
 			var results = checkAround(mouse);
-			if (mouse.BackDirection == direction)
+			if (mouse.BackDirection == direction || checkDirection(mouse, direction) == 1)
 				return false;
 			switch (direction)
 			{
@@ -259,7 +261,8 @@ namespace cheese_v2
 
 		private void startButton_Click(object sender, EventArgs e)
 		{
-
+			update.Enabled = true;
+			update.Start();
 		}
 		public static void SetDoubleBuffered(System.Windows.Forms.Control c)
 		{
@@ -269,6 +272,12 @@ namespace cheese_v2
 			System.Reflection.BindingFlags.NonPublic |
 			System.Reflection.BindingFlags.Instance);
 			aProp.SetValue(c, true, null);
+		}
+
+		private void update_Tick(object sender, EventArgs e)
+		{
+			move(mouse);
+			mazeTable.Refresh();
 		}
 	}
 }

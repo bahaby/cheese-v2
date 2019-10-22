@@ -28,11 +28,13 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.startButton = new System.Windows.Forms.Button();
 			this.resetButton = new System.Windows.Forms.Button();
 			this.mapSelect = new System.Windows.Forms.ComboBox();
 			this.selectMode = new System.Windows.Forms.ComboBox();
 			this.mazeTable = new System.Windows.Forms.TableLayoutPanel();
+			this.update = new System.Windows.Forms.Timer(this.components);
 			this.SuspendLayout();
 			// 
 			// startButton
@@ -128,6 +130,11 @@
 			this.mazeTable.TabIndex = 0;
 			this.mazeTable.CellPaint += new System.Windows.Forms.TableLayoutCellPaintEventHandler(this.mazeTable_CellPaint);
 			// 
+			// update
+			// 
+			this.update.Interval = 200;
+			this.update.Tick += new System.EventHandler(this.update_Tick);
+			// 
 			// Game
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -150,6 +157,7 @@
 		private System.Windows.Forms.ComboBox mapSelect;
 		private System.Windows.Forms.ComboBox selectMode;
 		private System.Windows.Forms.TableLayoutPanel mazeTable;
+		private System.Windows.Forms.Timer update;
 	}
 }
 
