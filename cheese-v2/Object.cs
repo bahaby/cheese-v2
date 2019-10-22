@@ -9,8 +9,8 @@ namespace cheese_v2
 	class Object
 	{
 		public int X { get; set; }
-		public Direction BackDirection { get; set; } 
 		public int Y { get; set; }
+		public Direction BackDirection { get; set; } 
 		public Object(int id)
 		{
 			this.Id = id;

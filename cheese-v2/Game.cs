@@ -21,14 +21,16 @@ namespace cheese_v2
 	public partial class Game : Form
 	{
 		Image mouseImage1 = Image.FromFile("..\\..\\img\\mouse1.jpg");
-		Image mouseImage2 = Image.FromFile("..\\..\\img\\mouse2.jpg");
+		Image mouseImage2 = Image.FromFile("..\\..\\img\\mouse3.jpg");
 		Image wallImage = Image.FromFile("..\\..\\img\\wall.jpg");
 		Image groundImage = Image.FromFile("..\\..\\img\\ground.jpg");
 		Image cheeseImage = Image.FromFile("..\\..\\img\\cheese.jpg");
 
+		// 2-) cheese 3-) 1. mouse 4-) 2. mouse
 		Object mouse = new Object(3);
 		Object mouse2 = new Object(4);
 		Object cheese = new Object(2);
+		Direction[] directions = { Direction.Up, Direction.Down, Direction.Left, Direction.Right };
 		bool gameOver;
 		public Game()
 		{
@@ -119,7 +121,6 @@ namespace cheese_v2
 		}
 		private Tuple<int, int, int, Direction> checkAround(Object mouse)
 		{
-			Direction[] directions = { Direction.Up, Direction.Down, Direction.Left, Direction.Right};
 			int wallCount = 0;
 			int roadCount = 0;
 			int objectType = 0;
@@ -152,24 +153,62 @@ namespace cheese_v2
 			var results = new Tuple<int, int, int, Direction> (roadCount, wallCount, objectType, objectDirection);
 			return results;
 		}
-	/*	private bool collide(Object obj1, Object obj2)
+		private void move(Object mouse)
 		{
-			if (checkAround(obj1, Direction.Up) == obj2.Id ||
-				checkAround(obj1, Direction.Down) == obj2.Id ||
-				checkAround(obj1, Direction.Left) == obj2.Id ||
-				checkAround(obj1, Direction.Right) == obj2.Id)
+			bool steps;
+			while (mouse.X == cheese.X && mouse.Y == cheese.Y)
 			{
-				return true;
-			}
-			return false;
-		}*/
-	/*	private void moveTo(Object mouse, int x, int y)
-		{
-			while(mouse.X == x && mouse.Y == y)
-			{
-				if (collide(mouse, cheese))
+				var results = checkAround(mouse);
+				//check if found cheese
+				if (results.Item3 == 2)
 				{
 					gameOver = true;
+				}
+				else if (results.Item2 != 3)
+				{
+					foreach(Direction direction in directions)
+					{
+						if (direction != mouse.BackDirection)
+						{
+							if (mouse.X < cheese.X && mouse.Y < cheese.Y)
+							{
+								if (step(mouse, Direction.Down))
+									return;
+								else if (step(mouse, Direction.Right))
+									return;
+
+							}
+							else if (mouse.X > cheese.X && mouse.Y < cheese.Y)
+							{
+
+							}
+							else if (mouse.X < cheese.X && mouse.Y > cheese.Y)
+							{
+
+							}
+							else if (mouse.X > cheese.X && mouse.Y > cheese.Y)
+							{
+
+							}
+						}
+					}
+
+			/*		if (mouse.X < cheese.X && mouse.Y < cheese.Y && mouse.BackDirection != )
+					{
+						step = step(mouse, )
+					}
+					else if (mouse.X > cheese.X && mouse.Y < cheese.Y)
+					{
+
+					}
+					else if (mouse.X < cheese.X && mouse.Y > cheese.Y)
+					{
+
+					}
+					else if (mouse.X > cheese.X && mouse.Y > cheese.Y)
+					{
+
+					}*/
 				}
 				else if (checkAround(mouse, Direction.Up) == 0)
 					move(mouse, Direction.Up);
@@ -180,11 +219,12 @@ namespace cheese_v2
 				else if (checkAround(mouse, Direction.Right) == 0)
 					move(mouse, Direction.Right);
 			}
-		}*/
-		private bool move(Object mouse, Direction direction)
+		}
+		private bool step(Object mouse, Direction direction)
 		{
 			int newX = mouse.X, newY = mouse.Y;
 			Direction backDirection;
+			var results = checkAround(mouse);
 			if (mouse.BackDirection == direction)
 				return false;
 			switch (direction)
@@ -207,7 +247,6 @@ namespace cheese_v2
 					backDirection = Direction.Left;
 					break;
 				default:
-					backDirection = Direction.None;
 					return false;
 			}
 			mazeMap[mouse.X, mouse.Y] = 0;
@@ -215,7 +254,6 @@ namespace cheese_v2
 			mouse.X = newX;
 			mouse.Y = newY;
 			mouse.BackDirection = backDirection;
-			mazeTable.Refresh();
 			return true;
 		}
 
