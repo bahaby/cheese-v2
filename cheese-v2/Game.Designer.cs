@@ -57,9 +57,11 @@
 			this.resetButton.TabIndex = 1;
 			this.resetButton.Text = "Reset";
 			this.resetButton.UseVisualStyleBackColor = true;
+			this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
 			// 
 			// mapSelect
 			// 
+			this.mapSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.mapSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.mapSelect.ForeColor = System.Drawing.SystemColors.MenuText;
 			this.mapSelect.FormattingEnabled = true;
@@ -74,10 +76,12 @@
 			this.mapSelect.Name = "mapSelect";
 			this.mapSelect.Size = new System.Drawing.Size(173, 24);
 			this.mapSelect.TabIndex = 2;
-			this.mapSelect.Text = "Select Map";
+			this.mapSelect.Tag = "";
+			this.mapSelect.SelectedIndexChanged += new System.EventHandler(this.mapSelect_SelectedIndexChanged);
 			// 
 			// selectMode
 			// 
+			this.selectMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.selectMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.selectMode.ForeColor = System.Drawing.SystemColors.MenuText;
 			this.selectMode.FormattingEnabled = true;
@@ -92,7 +96,6 @@
 			this.selectMode.Name = "selectMode";
 			this.selectMode.Size = new System.Drawing.Size(173, 24);
 			this.selectMode.TabIndex = 2;
-			this.selectMode.Text = "Select Mode";
 			// 
 			// mazeTable
 			// 
@@ -132,7 +135,6 @@
 			// 
 			// update
 			// 
-			this.update.Interval = 200;
 			this.update.Tick += new System.EventHandler(this.update_Tick);
 			// 
 			// Game
@@ -147,6 +149,8 @@
 			this.Controls.Add(this.mazeTable);
 			this.Name = "Game";
 			this.Text = "Game";
+			this.Load += new System.EventHandler(this.Game_Load);
+			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Game_KeyDown);
 			this.ResumeLayout(false);
 
 		}

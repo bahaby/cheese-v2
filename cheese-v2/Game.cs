@@ -21,42 +21,66 @@ namespace cheese_v2
 	public partial class Game : Form
 	{
 		Image mouseImage1 = Image.FromFile("..\\..\\img\\mouse1.jpg");
-		Image mouseImage2 = Image.FromFile("..\\..\\img\\mouse3.jpg");
+		Image mouseImage2 = Image.FromFile("..\\..\\img\\mouse2.jpg");
 		Image wallImage = Image.FromFile("..\\..\\img\\wall.jpg");
 		Image groundImage = Image.FromFile("..\\..\\img\\ground.jpg");
 		Image cheeseImage = Image.FromFile("..\\..\\img\\cheese.jpg");
 
 		// 2-) cheese 3-) 1. mouse 4-) 2. mouse
-		Object mouse = new Object(3);
+		Object mouse1 = new Object(3);
 		Object mouse2 = new Object(4);
 		Object cheese = new Object(2);
 		Direction[] directions = { Direction.Up, Direction.Down, Direction.Left, Direction.Right };
 		bool gameOver;
+		Direction pressed = Direction.None;
 		public Game()
 		{
-			gameOver = false;
 			InitializeComponent();
 			SetDoubleBuffered(mazeTable);
-			mouse = findUniqueObject(3);
-			mouse2 = findUniqueObject(4);
+			this.KeyPreview = true;
+			gameOver = false;
+			selectMaze(0);
 			cheese = findUniqueObject(2);
-			Console.WriteLine(checkAround(mouse).Item1 + " " + checkAround(mouse).Item2 + " " + checkAround(mouse).Item3 + " " + checkAround(mouse).Item4);
-			Console.WriteLine(checkAround(mouse2).Item1 + " " + checkAround(mouse2).Item2 + " " + checkAround(mouse2).Item3 + " " + checkAround(mouse2).Item4);
+			mouse1 = findUniqueObject(3);
+			mouse2 = findUniqueObject(4);
 		}
 
-		int[,] mazeMap ={
+		int[,] steps = new int[10, 15];
+		int[,,] mazeMaps = { {
 				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-				{ 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-				{ 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1},
-				{ 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 0, 1},
-				{ 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-				{ 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-				{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1},
-				{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1},
-				{ 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1},
+				{ 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 1},
+				{ 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1},
+				{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+				{ 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1},
+				{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+				{ 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1},
+				{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 3, 1},
+				{ 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
 				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-			};
-
+			},{
+				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+				{ 1, 2, 0, 0, 0, 1, 1, 0, 0, 0, 4, 0, 0, 0, 1},
+				{ 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1},
+				{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+				{ 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1},
+				{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+				{ 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1},
+				{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 3, 1},
+				{ 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+			},{
+				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+				{ 1, 2, 0, 0, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 1},
+				{ 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1},
+				{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+				{ 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1},
+				{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+				{ 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1},
+				{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 3, 1},
+				{ 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+			} };
+		int[,] mazeMap = new int[10, 15];
 		private void mazeTable_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
 		{
 			for (int i = 0; i < 10; i++)
@@ -106,6 +130,7 @@ namespace cheese_v2
 		}
 		private int checkDirection(Object mouse, Direction direction)
 		{
+
 			switch (direction)
 			{
 				case Direction.Up:
@@ -119,146 +144,117 @@ namespace cheese_v2
 			}
 			return -1;
 		}
-		private Tuple<int, int, int, Direction> checkAround(Object mouse)
+		private int checkSteps(Object mouse, Direction direction)
 		{
-			int wallCount = 0;
-			int roadCount = 0;
+			switch (direction)
+			{
+				case Direction.Up:
+					return steps[mouse.X - 1, mouse.Y];
+				case Direction.Down:
+					return steps[mouse.X + 1, mouse.Y];
+				case Direction.Left:
+					return steps[mouse.X, mouse.Y - 1];
+				case Direction.Right:
+					return steps[mouse.X, mouse.Y + 1];
+			}
+			return -1;
+		}
+		private Tuple<int, Direction> checkAround(Object mouse)
+		{
 			int objectType = 0;
-			Direction objectDirection = Direction.None;
+			int lowestStep = 0;
+			Direction lowestDirection = Direction.None;
+			bool first = true;
 			foreach(Direction direction in directions)
 			{
 				switch (checkDirection(mouse, direction))
 				{
-					case 0:
-						roadCount++;
-						break;
-					case 1:
-						wallCount++;
-						break;
 					case 2:
 						objectType = 2;
-						objectDirection = direction;
 						break;
 					case 3:
 						objectType = 3;
-						objectDirection = direction;
 						break;
 					case 4:
 						objectType = 4;
-						objectDirection = direction;
 						break;
 				}
+				if (stepValidate(mouse, direction))
+				{
+					if (first)
+					{
+						lowestStep = checkSteps(mouse, direction);
+						lowestDirection = direction;
+					}
+					if (lowestStep > checkSteps(mouse, direction))
+					{
+						lowestStep = checkSteps(mouse, direction);
+						lowestDirection = direction;
+					}
+					first = false;
+				}
 			}
+			
 
-			var results = new Tuple<int, int, int, Direction> (roadCount, wallCount, objectType, objectDirection);
+			var results = new Tuple<int, Direction> (objectType, lowestDirection);
 			return results;
 		}
-		private void move(Object mouse)
+		private void autoMove(Object mouse)
 		{
 			var results = checkAround(mouse);
 			//check if found cheese
-			if (results.Item3 == 2)
+			if (results.Item1 == 2)
 			{
 				gameOver = true;
 			}
-			else if (results.Item2 != 3)
+			else
 			{
-				foreach(Direction direction in directions)
-				{
-					if (direction != mouse.BackDirection)
-					{
-						if (mouse.X <= cheese.X && mouse.Y <= cheese.Y)
-						{
-							if (step(mouse, Direction.Down))
-								return;
-							else if (step(mouse, Direction.Right))
-								return;
-
-						}
-						else if (mouse.X >= cheese.X && mouse.Y <= cheese.Y)
-						{
-
-							if (step(mouse, Direction.Up))
-								return;
-							else if (step(mouse, Direction.Right))
-								return;
-						}
-						else if (mouse.X <= cheese.X && mouse.Y >= cheese.Y)
-						{
-
-							if (step(mouse, Direction.Down))
-								return;
-							else if (step(mouse, Direction.Left))
-								return;
-						}
-						else if (mouse.X >= cheese.X && mouse.Y >= cheese.Y)
-						{
-
-							if (step(mouse, Direction.Up))
-								return;
-							else if (step(mouse, Direction.Left))
-								return;
-						}
-					}
-				}
-
-		/*		if (mouse.X < cheese.X && mouse.Y < cheese.Y && mouse.BackDirection != )
-				{
-					step = step(mouse, )
-				}
-				else if (mouse.X > cheese.X && mouse.Y < cheese.Y)
-				{
-
-				}
-				else if (mouse.X < cheese.X && mouse.Y > cheese.Y)
-				{
-
-				}
-				else if (mouse.X > cheese.X && mouse.Y > cheese.Y)
-				{
-
-				}*/
+				step(mouse, results.Item2);
 			}
 			
 		}
-		//duvar kontrolu burda yapılacak
-		private bool step(Object mouse, Direction direction)
+
+		private void keyboardMove(Object mouse)
+		{
+			if (pressed != Direction.None)
+			{
+				step(mouse, pressed);
+			}
+		}
+		private void step(Object mouse, Direction direction)
 		{
 			int newX = mouse.X, newY = mouse.Y;
-			Direction backDirection;
-			var results = checkAround(mouse);
-			if (mouse.BackDirection == direction || checkDirection(mouse, direction) == 1)
-				return false;
+			if (!stepValidate(mouse, direction))
+				return;
 			switch (direction)
 			{
 				case Direction.Up:
 					newX -= 1;
-					backDirection = Direction.Down;
-					
 					break;
 				case Direction.Down:
 					newX += 1;
-					backDirection = Direction.Up;
 					break;
 				case Direction.Left:
 					newY -= 1;
-					backDirection = Direction.Right;
 					break;
 				case Direction.Right:
 					newY += 1;
-					backDirection = Direction.Left;
 					break;
-				default:
-					return false;
 			}
 			mazeMap[mouse.X, mouse.Y] = 0;
 			mazeMap[newX, newY] = mouse.Id;
+			steps[mouse.X, mouse.Y]++;
 			mouse.X = newX;
 			mouse.Y = newY;
-			mouse.BackDirection = backDirection;
+			mazeTable.Refresh();
+		}
+		private bool stepValidate(Object mouse, Direction direction)
+		{
+			int check = checkDirection(mouse, direction);
+			if (check == 1 || check == 3 || check == 4)
+				return false;
 			return true;
 		}
-
 		private void startButton_Click(object sender, EventArgs e)
 		{
 			update.Enabled = true;
@@ -273,10 +269,68 @@ namespace cheese_v2
 			System.Reflection.BindingFlags.Instance);
 			aProp.SetValue(c, true, null);
 		}
-
+		private void selectMaze(int n)
+		{
+			for (int i = 0; i<10; i++)
+			{
+				for (int j = 0; j<15; j++)
+				{
+					mazeMap[i, j] = mazeMaps[n, i, j];
+				}
+			}
+		}
 		private void update_Tick(object sender, EventArgs e)
 		{
-			move(mouse);
+			if (!gameOver)
+			{
+				autoMove(mouse1);;
+			}
+		}
+
+		private void Game_KeyDown(object sender, KeyEventArgs e)
+		{
+			switch (e.KeyCode)
+			{
+				case Keys.W:
+					step(mouse2, Direction.Up);
+					break;
+				case Keys.S:
+					step(mouse2, Direction.Down);
+					break;
+				case Keys.A:
+					step(mouse2, Direction.Left);
+					break;
+				case Keys.D:
+					step(mouse2, Direction.Right);
+					break;
+				default:
+					break;
+			}
+		}
+		public void resetGame()
+		{
+			update.Stop();
+			selectMaze(mapSelect.SelectedIndex);
+			mouse1 = findUniqueObject(3);
+			mouse2 = findUniqueObject(4);
+			steps = new int[10, 15];
+			gameOver = false;
+		}
+		private void Game_Load(object sender, EventArgs e)
+		{
+			
+		}
+
+		private void resetButton_Click(object sender, EventArgs e)
+		{
+			resetGame();
+			mazeTable.Refresh();
+		}
+
+		private void mapSelect_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			resetGame();
+			selectMaze(mapSelect.SelectedIndex);
 			mazeTable.Refresh();
 		}
 	}
