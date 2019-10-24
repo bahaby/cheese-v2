@@ -32,7 +32,6 @@ namespace cheese_v2
 		Object cheese = new Object(2);
 		Direction[] directions = { Direction.Up, Direction.Down, Direction.Left, Direction.Right };
 		bool gameOver;
-		Direction pressed = Direction.None;
 		public Game()
 		{
 			InitializeComponent();
@@ -159,18 +158,16 @@ namespace cheese_v2
 			}
 			return -1;
 		}
-		private Tuple<int, Direction> checkAround(Object mouse)
+		private int checkAround(Object mouse)
 		{
 			int objectType = 0;
-			int lowestStep = 0;
-			Direction lowestDirection = Direction.None;
-			bool first = true;
 			foreach(Direction direction in directions)
 			{
 				switch (checkDirection(mouse, direction))
 				{
 					case 2:
 						objectType = 2;
+						gameOver = true;
 						break;
 					case 3:
 						objectType = 3;
@@ -179,6 +176,17 @@ namespace cheese_v2
 						objectType = 4;
 						break;
 				}
+			}
+			return objectType;
+		}
+		private Direction findDirection(Object mouse)
+		{
+			int lowestStep = 0;
+			Direction lowestDirection = Direction.None;
+			bool first = true;
+
+			foreach (Direction direction in directions)
+			{
 				if (stepValidate(mouse, direction))
 				{
 					if (first)
@@ -194,33 +202,22 @@ namespace cheese_v2
 					first = false;
 				}
 			}
-			
-
-			var results = new Tuple<int, Direction> (objectType, lowestDirection);
-			return results;
+			return lowestDirection;
 		}
 		private void autoMove(Object mouse)
 		{
-			var results = checkAround(mouse);
-			//check if found cheese
-			if (results.Item1 == 2)
-			{
-				gameOver = true;
-			}
-			else
-			{
-				step(mouse, results.Item2);
-			}
-			
+			step(mouse, findDirection(mouse));
+			checkAround(mouse);
+
 		}
 
-		private void keyboardMove(Object mouse)
+		/*private void keyboardMove(Object mouse)
 		{
 			if (pressed != Direction.None)
 			{
 				step(mouse, pressed);
 			}
-		}
+		}*/
 		private void step(Object mouse, Direction direction)
 		{
 			int newX = mouse.X, newY = mouse.Y;
@@ -289,23 +286,27 @@ namespace cheese_v2
 
 		private void Game_KeyDown(object sender, KeyEventArgs e)
 		{
-			switch (e.KeyCode)
+			if (!gameOver)
 			{
-				case Keys.W:
-					step(mouse2, Direction.Up);
-					break;
-				case Keys.S:
-					step(mouse2, Direction.Down);
-					break;
-				case Keys.A:
-					step(mouse2, Direction.Left);
-					break;
-				case Keys.D:
-					step(mouse2, Direction.Right);
-					break;
-				default:
-					break;
+				switch (e.KeyCode)
+				{
+					case Keys.W:
+						step(mouse2, Direction.Up);
+						break;
+					case Keys.S:
+						step(mouse2, Direction.Down);
+						break;
+					case Keys.A:
+						step(mouse2, Direction.Left);
+						break;
+					case Keys.D:
+						step(mouse2, Direction.Right);
+						break;
+					default:
+						break;
+				}
 			}
+			checkAround(mouse2);
 		}
 		public void resetGame()
 		{
