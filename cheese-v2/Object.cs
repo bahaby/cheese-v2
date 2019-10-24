@@ -10,6 +10,7 @@ namespace cheese_v2
 	{
 		public int X { get; set; }
 		public int Y { get; set; }
+		public int StepCount { get; set; }
 		public Object(int id)
 		{
 			this.Id = id;

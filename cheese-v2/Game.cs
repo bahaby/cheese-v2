@@ -250,6 +250,7 @@ namespace cheese_v2
 			steps[mouse.X, mouse.Y]++;
 			mouse.X = newX;
 			mouse.Y = newY;
+			mouse.StepCount++;
 			mazeTable.Refresh();
 		}
 		private bool stepValidate(Object mouse, Direction direction)
@@ -299,12 +300,25 @@ namespace cheese_v2
 			}
 			MessageBox.Show(message);*/
 		}
+		private void endGame()
+		{
+			int check = checkAround(cheese);
+			string message="";
+			if (check == 3)
+				message = "kazanan computer " + mouse1.StepCount + " adımda bitirdi";
+			if (check == 4)
+				message = "kazanan player " + mouse2.StepCount + " adımda bitirdi";
+			resetGame();
+			MessageBox.Show(message);
+		}
 		private void update_Tick(object sender, EventArgs e)
 		{
 			if (!gameOver && timer)
 			{
 				autoMove(mouse1);
 			}
+			if (gameOver)
+				endGame();
 		}
 
 		private void Game_KeyDown(object sender, KeyEventArgs e)
@@ -330,6 +344,7 @@ namespace cheese_v2
 				}
 			}
 			checkAround(mouse2);
+			if (gameOver) endGame();
 		}
 		public void resetGame()
 		{
