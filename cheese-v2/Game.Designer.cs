@@ -137,6 +137,7 @@
 			// 
 			// update
 			// 
+			this.update.Tick += new System.EventHandler(this.update_Tick);
 			// 
 			// Game
 			// 
@@ -152,6 +153,7 @@
 			this.Text = "Game";
 			this.Load += new System.EventHandler(this.Game_Load);
 			this.ResumeLayout(false);
+			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Game_KeyDown);
 
 		}
 

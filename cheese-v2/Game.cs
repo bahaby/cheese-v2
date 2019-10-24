@@ -40,6 +40,7 @@ namespace cheese_v2
 		Direction[] directions = { Direction.Up, Direction.Down, Direction.Left, Direction.Right };
 		GameMode gameMode = GameMode.Player;
 		bool gameOver;
+		bool timer = false, keyboard = false;
 		public Game()
 		{
 			InitializeComponent();
@@ -167,7 +168,7 @@ namespace cheese_v2
 		private int checkAround(Object mouse)
 		{
 			int objectType = 0;
-			foreach(Direction direction in directions)
+			foreach (Direction direction in directions)
 			{
 				switch (checkDirection(mouse, direction))
 				{
@@ -261,7 +262,8 @@ namespace cheese_v2
 		private void startButton_Click(object sender, EventArgs e)
 		{
 			update.Start();
-			this.KeyDown += new KeyEventHandler(this.Game_KeyDown);
+			if (gameMode != GameMode.Computer)
+				keyboard = true;
 		}
 		public static void SetDoubleBuffered(System.Windows.Forms.Control c)
 		{
@@ -274,9 +276,9 @@ namespace cheese_v2
 		}
 		private void selectMaze(int n)
 		{
-			for (int i = 0; i<10; i++)
+			for (int i = 0; i < 10; i++)
 			{
-				for (int j = 0; j<15; j++)
+				for (int j = 0; j < 15; j++)
 				{
 					if (mazeMaps[n, i, j] == 3 && gameMode == GameMode.Player)
 						mazeMap[i, j] = 0;
@@ -299,15 +301,15 @@ namespace cheese_v2
 		}
 		private void update_Tick(object sender, EventArgs e)
 		{
-			if (!gameOver)
+			if (!gameOver && timer)
 			{
-				autoMove(mouse1);;
+				autoMove(mouse1);
 			}
 		}
 
 		private void Game_KeyDown(object sender, KeyEventArgs e)
 		{
-			if (!gameOver && gameMode != GameMode.Computer)
+			if (!gameOver && keyboard)
 			{
 				switch (e.KeyCode)
 				{
@@ -331,28 +333,27 @@ namespace cheese_v2
 		}
 		public void resetGame()
 		{
-			this.KeyDown -= new KeyEventHandler(this.Game_KeyDown);
 			update.Stop();
 			selectMaze(mapSelect.SelectedIndex);
 			steps = new int[10, 15];
 			gameOver = false;
+			keyboard = false;
+			timer = false;
 			mouse1 = findUniqueObject(3);
 			mouse2 = findUniqueObject(4);
 			switch (gameMode)
 			{
 				case GameMode.Computer:
-					this.update.Tick += new EventHandler(this.update_Tick);
+					timer = true;
 					break;
 				case GameMode.Player:
-					this.update.Tick -= new EventHandler(this.update_Tick);
 					update.Enabled = true;
 					update.Stop();
 					break;
 				case GameMode.PlayervsComputer:
-					this.update.Tick += new EventHandler(this.update_Tick);
+					timer = true;
 					break;
 				case GameMode.PlayervsPlayer:
-					this.update.Tick -= new EventHandler(this.update_Tick);
 					update.Enabled = true;
 					update.Stop();
 					break;
