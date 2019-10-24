@@ -14,7 +14,7 @@ namespace cheese_v2
 		{
 			this.Id = id;
 		}
-		public int Id { get; private set; }
+		public int Id { get; set; }
 
 	}
 }

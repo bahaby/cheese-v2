@@ -18,6 +18,13 @@ namespace cheese_v2
 		Left,
 		Right
 	};
+	public enum GameMode
+	{
+		Player,
+		Computer,
+		PlayervsComputer,
+		PlayervsPlayer
+	}
 	public partial class Game : Form
 	{
 		Image mouseImage1 = Image.FromFile("..\\..\\img\\mouse1.jpg");
@@ -27,10 +34,11 @@ namespace cheese_v2
 		Image cheeseImage = Image.FromFile("..\\..\\img\\cheese.jpg");
 
 		// 2-) cheese 3-) 1. mouse 4-) 2. mouse
+		Object cheese = new Object(2);
 		Object mouse1 = new Object(3);
 		Object mouse2 = new Object(4);
-		Object cheese = new Object(2);
 		Direction[] directions = { Direction.Up, Direction.Down, Direction.Left, Direction.Right };
+		GameMode gameMode = GameMode.Player;
 		bool gameOver;
 		public Game()
 		{
@@ -40,8 +48,6 @@ namespace cheese_v2
 			gameOver = false;
 			selectMaze(0);
 			cheese = findUniqueObject(2);
-			mouse1 = findUniqueObject(3);
-			mouse2 = findUniqueObject(4);
 		}
 
 		int[,] steps = new int[10, 15];
@@ -254,8 +260,8 @@ namespace cheese_v2
 		}
 		private void startButton_Click(object sender, EventArgs e)
 		{
-			update.Enabled = true;
 			update.Start();
+			this.KeyDown += new KeyEventHandler(this.Game_KeyDown);
 		}
 		public static void SetDoubleBuffered(System.Windows.Forms.Control c)
 		{
@@ -272,9 +278,24 @@ namespace cheese_v2
 			{
 				for (int j = 0; j<15; j++)
 				{
-					mazeMap[i, j] = mazeMaps[n, i, j];
+					if (mazeMaps[n, i, j] == 3 && gameMode == GameMode.Player)
+						mazeMap[i, j] = 0;
+					else if (mazeMaps[n, i, j] == 4 && gameMode == GameMode.Computer)
+						mazeMap[i, j] = 0;
+					else
+						mazeMap[i, j] = mazeMaps[n, i, j];
 				}
 			}
+			/*string message = "";
+			for (int i = 0; i < 10; i++)
+			{
+				for (int j = 0; j < 15; j++)
+				{
+					message += mazeMap[i, j] + " ,";
+				}
+				message += "\n";
+			}
+			MessageBox.Show(message);*/
 		}
 		private void update_Tick(object sender, EventArgs e)
 		{
@@ -286,7 +307,7 @@ namespace cheese_v2
 
 		private void Game_KeyDown(object sender, KeyEventArgs e)
 		{
-			if (!gameOver)
+			if (!gameOver && gameMode != GameMode.Computer)
 			{
 				switch (e.KeyCode)
 				{
@@ -310,28 +331,87 @@ namespace cheese_v2
 		}
 		public void resetGame()
 		{
+			this.KeyDown -= new KeyEventHandler(this.Game_KeyDown);
 			update.Stop();
 			selectMaze(mapSelect.SelectedIndex);
-			mouse1 = findUniqueObject(3);
-			mouse2 = findUniqueObject(4);
 			steps = new int[10, 15];
 			gameOver = false;
+			mouse1 = findUniqueObject(3);
+			mouse2 = findUniqueObject(4);
+			switch (gameMode)
+			{
+				case GameMode.Computer:
+					this.update.Tick += new EventHandler(this.update_Tick);
+					break;
+				case GameMode.Player:
+					this.update.Tick -= new EventHandler(this.update_Tick);
+					update.Enabled = true;
+					update.Stop();
+					break;
+				case GameMode.PlayervsComputer:
+					this.update.Tick += new EventHandler(this.update_Tick);
+					break;
+				case GameMode.PlayervsPlayer:
+					this.update.Tick -= new EventHandler(this.update_Tick);
+					update.Enabled = true;
+					update.Stop();
+					break;
+			}
 		}
 		private void Game_Load(object sender, EventArgs e)
 		{
-			
+			mapSelect.SelectedIndex = 0;
+			modeSelect.SelectedIndex = 0;
 		}
 
 		private void resetButton_Click(object sender, EventArgs e)
 		{
 			resetGame();
+			mapSelect.SelectedIndex = 0;
+			modeSelect.SelectedIndex = 0;
 			mazeTable.Refresh();
 		}
 
 		private void mapSelect_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			resetGame();
 			selectMaze(mapSelect.SelectedIndex);
+			mazeTable.Refresh();
+		}
+		/*public void gameMode(int n)
+		{
+			mouse1 = findUniqueObject(3);
+			mouse2 = findUniqueObject(4);
+			if (n == 0)
+			{
+				mouse2.Id = 0;
+				mazeMap[mouse2.X, mouse2.Y] = 0;
+			}
+			else if (n == 1)
+			{
+				mouse1.Id = 0;
+				mazeMap[mouse1.X, mouse1.Y] = 0;
+				mazeTable.Refresh();
+			}
+		}*/
+
+		private void modeSelect_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			switch (modeSelect.SelectedIndex)
+			{
+				case 0:
+					gameMode = GameMode.Player;
+					break;
+				case 1:
+					gameMode = GameMode.Computer;
+					break;
+				case 2:
+					gameMode = GameMode.PlayervsComputer;
+					break;
+				case 3:
+					gameMode = GameMode.PlayervsPlayer;
+					break;
+			}
+			resetGame();
 			mazeTable.Refresh();
 		}
 	}

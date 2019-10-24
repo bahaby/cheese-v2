@@ -32,7 +32,7 @@
 			this.startButton = new System.Windows.Forms.Button();
 			this.resetButton = new System.Windows.Forms.Button();
 			this.mapSelect = new System.Windows.Forms.ComboBox();
-			this.selectMode = new System.Windows.Forms.ComboBox();
+			this.modeSelect = new System.Windows.Forms.ComboBox();
 			this.mazeTable = new System.Windows.Forms.TableLayoutPanel();
 			this.update = new System.Windows.Forms.Timer(this.components);
 			this.SuspendLayout();
@@ -79,23 +79,25 @@
 			this.mapSelect.Tag = "";
 			this.mapSelect.SelectedIndexChanged += new System.EventHandler(this.mapSelect_SelectedIndexChanged);
 			// 
-			// selectMode
+			// modeSelect
 			// 
-			this.selectMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.selectMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.selectMode.ForeColor = System.Drawing.SystemColors.MenuText;
-			this.selectMode.FormattingEnabled = true;
-			this.selectMode.IntegralHeight = false;
-			this.selectMode.ItemHeight = 16;
-			this.selectMode.Items.AddRange(new object[] {
+			this.modeSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.modeSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.modeSelect.ForeColor = System.Drawing.SystemColors.MenuText;
+			this.modeSelect.FormattingEnabled = true;
+			this.modeSelect.IntegralHeight = false;
+			this.modeSelect.ItemHeight = 16;
+			this.modeSelect.Items.AddRange(new object[] {
+            "player",
             "computer",
             "player vs computer",
             "player vs player"});
-			this.selectMode.Location = new System.Drawing.Point(207, 653);
-			this.selectMode.Margin = new System.Windows.Forms.Padding(0);
-			this.selectMode.Name = "selectMode";
-			this.selectMode.Size = new System.Drawing.Size(173, 24);
-			this.selectMode.TabIndex = 2;
+			this.modeSelect.Location = new System.Drawing.Point(207, 653);
+			this.modeSelect.Margin = new System.Windows.Forms.Padding(0);
+			this.modeSelect.Name = "modeSelect";
+			this.modeSelect.Size = new System.Drawing.Size(173, 24);
+			this.modeSelect.TabIndex = 2;
+			this.modeSelect.SelectedIndexChanged += new System.EventHandler(this.modeSelect_SelectedIndexChanged);
 			// 
 			// mazeTable
 			// 
@@ -135,14 +137,13 @@
 			// 
 			// update
 			// 
-			this.update.Tick += new System.EventHandler(this.update_Tick);
 			// 
 			// Game
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(920, 690);
-			this.Controls.Add(this.selectMode);
+			this.Controls.Add(this.modeSelect);
 			this.Controls.Add(this.mapSelect);
 			this.Controls.Add(this.resetButton);
 			this.Controls.Add(this.startButton);
@@ -150,7 +151,6 @@
 			this.Name = "Game";
 			this.Text = "Game";
 			this.Load += new System.EventHandler(this.Game_Load);
-			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Game_KeyDown);
 			this.ResumeLayout(false);
 
 		}
@@ -159,7 +159,7 @@
 		private System.Windows.Forms.Button startButton;
 		private System.Windows.Forms.Button resetButton;
 		private System.Windows.Forms.ComboBox mapSelect;
-		private System.Windows.Forms.ComboBox selectMode;
+		private System.Windows.Forms.ComboBox modeSelect;
 		private System.Windows.Forms.TableLayoutPanel mazeTable;
 		private System.Windows.Forms.Timer update;
 	}
