@@ -137,7 +137,6 @@
 			// 
 			// update
 			// 
-			this.update.Interval = 600;
 			this.update.Tick += new System.EventHandler(this.update_Tick);
 			// 
 			// Game
