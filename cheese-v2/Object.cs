@@ -41,6 +41,20 @@ namespace cheese_v2
 			}
 
 		}
-
+		public int check(int[,] array, Direction direction)
+		{
+			switch (direction)
+			{
+				case Direction.Up:
+					return array[this.X - 1, this.Y];
+				case Direction.Down:
+					return array[this.X + 1, this.Y];
+				case Direction.Left:
+					return array[this.X, this.Y - 1];
+				case Direction.Right:
+					return array[this.X, this.Y + 1];
+			}
+			return 0;
+		}
 	}
 }

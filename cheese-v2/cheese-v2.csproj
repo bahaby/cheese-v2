@@ -34,6 +34,10 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <Win32Resource>
+    </Win32Resource>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -68,6 +72,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\DataSources\Object.datasource" />
     <None Include="Properties\Settings.settings">
@@ -82,6 +87,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="img\cheese.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="img\ground.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="img\mouse1.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="img\mouse2.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="img\mouse3.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="img\wall.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

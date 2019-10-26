@@ -18,6 +18,7 @@ namespace cheese_v2
 		Left,
 		Right
 	};
+	//oyun modları
 	public enum GameMode
 	{
 		Player,
@@ -25,6 +26,7 @@ namespace cheese_v2
 		PlayervsComputer,
 		PlayervsPlayer
 	}
+	//mazeMap dizisindeki int değerlere karşılık gelecek terimler
 	public enum Map
 	{
 		Road,
@@ -35,31 +37,29 @@ namespace cheese_v2
 	}
 	public partial class Game : Form
 	{
-		Image mouseImage1 = Image.FromFile("..\\..\\img\\mouse1.jpg");
-		Image mouseImage2 = Image.FromFile("..\\..\\img\\mouse2.jpg");
-		Image wallImage = Image.FromFile("..\\..\\img\\wall.jpg");
-		Image groundImage = Image.FromFile("..\\..\\img\\ground.jpg");
-		Image cheeseImage = Image.FromFile("..\\..\\img\\cheese.jpg");
+		//resim dosyalarını ekleme
+		Image mouseImage1 = Properties.Resources.mouse1;
+		Image mouseImage2 = Properties.Resources.mouse2;
+		Image wallImage = Properties.Resources.wall;
+		Image groundImage = Properties.Resources.ground;
+		Image cheeseImage = Properties.Resources.cheese;
+		
 
-		// 2-) cheese 3-) 1. mouse 4-) 2. mouse
 		Object cheese = new Object(Map.Cheese);
 		Object mouse1 = new Object(Map.Player1);
 		Object mouse2 = new Object(Map.Player2);
 		Direction[] directions = { Direction.Up, Direction.Down, Direction.Left, Direction.Right };
 		GameMode gameMode = GameMode.Player;
-		bool gameOver;
-		bool timer = false, keyboard = false;
+		bool gameOver = false;
+		bool timerEnabled = false, keyboardEnabled = false;
 		public Game()
 		{
 			InitializeComponent();
-			SetDoubleBuffered(mazeTable);
+			SetDoubleBuffered(mazeTable); // dalgalanma sorunu için
 			this.KeyPreview = true;
-			gameOver = false;
 			selectMaze(0);
-			cheese = findObject(Map.Cheese);
 		}
-
-		int[,] steps = new int[10, 15];
+		
 		int[,,] mazeMaps = { {
 				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 				{ 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 1},
@@ -73,60 +73,29 @@ namespace cheese_v2
 				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 			},{
 				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-				{ 1, 2, 0, 0, 0, 1, 1, 0, 0, 0, 4, 0, 0, 0, 1},
+				{ 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 4, 0, 0, 0, 1},
 				{ 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1},
 				{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
 				{ 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1},
 				{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 				{ 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1},
 				{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 3, 1},
-				{ 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+				{ 1, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
 				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 			},{
 				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-				{ 1, 2, 0, 0, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 1},
+				{ 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 1},
 				{ 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1},
 				{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
 				{ 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1},
 				{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 				{ 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1},
 				{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 3, 1},
-				{ 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+				{ 1, 0, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1},
 				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 			} };
 		int[,] mazeMap = new int[10, 15];
-		private void mazeTable_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
-		{
-			for (int i = 0; i < 10; i++)
-			{
-				for (int j = 0; j < 15; j++)
-				{
-					if (e.Column == j && e.Row == i)
-					{
-						switch (mazeMap[i, j])
-						{
-							case -1:
-							case 0:
-								//e.Graphics.DrawImage(groundImage, e.CellBounds);
-								e.Graphics.DrawString(steps[i, j].ToString(), new Font("Arial", 16), new SolidBrush(Color.Black), e.CellBounds);
-								break;
-							case 1:
-								e.Graphics.DrawImage(wallImage, e.CellBounds);
-								break;
-							case 2:
-								e.Graphics.DrawImage(cheeseImage, e.CellBounds);
-								break;
-							case 3:
-								e.Graphics.DrawImage(mouseImage1, e.CellBounds);
-								break;
-							case 4:
-								e.Graphics.DrawImage(mouseImage2, e.CellBounds);
-								break;
-						}
-					}
-				}
-			}
-		}
+		int[,] steps = new int[10, 15];
 		private Object findObject(Map mapItem)
 		{
 			Object obj = new Object(mapItem);
@@ -143,42 +112,12 @@ namespace cheese_v2
 			}
 			return obj;
 		}
-		private Map checkDirection(Object mouse, Direction direction)
-		{
-			switch (direction)
-			{
-				case Direction.Up:
-					return (Map)mazeMap[mouse.X - 1, mouse.Y];
-				case Direction.Down:
-					return (Map)mazeMap[mouse.X + 1, mouse.Y];
-				case Direction.Left:
-					return (Map)mazeMap[mouse.X, mouse.Y - 1];
-				case Direction.Right:
-					return (Map)mazeMap[mouse.X, mouse.Y + 1];
-			}
-			return Map.Road;
-		}
-		private int checkSteps(Object mouse, Direction direction)
-		{
-			switch (direction)
-			{
-				case Direction.Up:
-					return steps[mouse.X - 1, mouse.Y];
-				case Direction.Down:
-					return steps[mouse.X + 1, mouse.Y];
-				case Direction.Left:
-					return steps[mouse.X, mouse.Y - 1];
-				case Direction.Right:
-					return steps[mouse.X, mouse.Y + 1];
-			}
-			return -1;
-		}
 		private Map checkAround(Object mouse)
 		{
-			Map objectType = 0;
+			Map objectType = Map.Road;
 			foreach (Direction direction in directions)
 			{
-				switch (checkDirection(mouse, direction))
+				switch ((Map)mouse.check(mazeMap, direction))
 				{
 					case Map.Cheese:
 						objectType = Map.Cheese;
@@ -211,12 +150,12 @@ namespace cheese_v2
 					{
 						if (first)
 						{
-							lowestStep = checkSteps(temp, direction);
+							lowestStep = temp.check(steps, direction);
 							bestDirection = direction;
 						}
-						if (lowestStep > checkSteps(temp, direction))
+						else if (lowestStep > temp.check(steps, direction))
 						{
-							lowestStep = checkSteps(temp, direction);
+							lowestStep = temp.check(steps, direction);
 							bestDirection = direction;
 						}
 						temp.move(direction);
@@ -236,13 +175,6 @@ namespace cheese_v2
 			checkAround(mouse);
 		}
 
-		/*private void keyboardMove(Object mouse)
-		{
-			if (pressed != Direction.None)
-			{
-				step(mouse, pressed);
-			}
-		}*/
 		private void step(Object mouse, Direction direction)
 		{
 			if (!stepValidate(mouse, direction))
@@ -256,25 +188,10 @@ namespace cheese_v2
 		}
 		private bool stepValidate(Object mouse, Direction direction)
 		{
-			Map check = checkDirection(mouse, direction);
+			Map check = (Map)mouse.check(mazeMap, direction);
 			if (check == Map.Wall || check == Map.Player1 || check == Map.Player2)
 				return false;
 			return true;
-		}
-		private void startButton_Click(object sender, EventArgs e)
-		{
-			update.Start();
-			if (gameMode != GameMode.Computer)
-				keyboard = true;
-		}
-		public static void SetDoubleBuffered(Control c)
-		{
-			if (SystemInformation.TerminalServerSession)
-				return;
-			System.Reflection.PropertyInfo aProp = typeof(Control).GetProperty("DoubleBuffered",
-			System.Reflection.BindingFlags.NonPublic |
-			System.Reflection.BindingFlags.Instance);
-			aProp.SetValue(c, true, null);
 		}
 		private void selectMaze(int n)
 		{
@@ -290,16 +207,6 @@ namespace cheese_v2
 						mazeMap[i, j] = mazeMaps[n, i, j];
 				}
 			}
-			/*string message = "";
-			for (int i = 0; i < 10; i++)
-			{
-				for (int j = 0; j < 15; j++)
-				{
-					message += mazeMap[i, j] + " ,";
-				}
-				message += "\n";
-			}
-			MessageBox.Show(message);*/
 		}
 		private void endGame()
 		{
@@ -310,64 +217,33 @@ namespace cheese_v2
 			if (check == Map.Player2)
 				message = "kazanan player " + mouse2.StepCount + " adımda bitirdi";
 			resetGame();
+			startButton.Enabled = false;
 			MessageBox.Show(message);
 		}
-		private void update_Tick(object sender, EventArgs e)
-		{
-			if (!gameOver && timer)
-			{
-				autoMove(mouse1);
-			}
-			if (gameOver)
-				endGame();
-		}
 
-		private void Game_KeyDown(object sender, KeyEventArgs e)
-		{
-			if (!gameOver && keyboard)
-			{
-				switch (e.KeyCode)
-				{
-					case Keys.W:
-						step(mouse2, Direction.Up);
-						break;
-					case Keys.S:
-						step(mouse2, Direction.Down);
-						break;
-					case Keys.A:
-						step(mouse2, Direction.Left);
-						break;
-					case Keys.D:
-						step(mouse2, Direction.Right);
-						break;
-					default:
-						break;
-				}
-			}
-			checkAround(mouse2);
-			if (gameOver) endGame();
-		}
 		public void resetGame()
 		{
 			update.Stop();
 			selectMaze(mapSelect.SelectedIndex);
+			startButton.Enabled = true;
 			steps = new int[10, 15];
 			gameOver = false;
-			keyboard = false;
-			timer = false;
+			keyboardEnabled = false;
+			timerEnabled = false;
 			mouse1 = findObject(Map.Player1);
 			mouse2 = findObject(Map.Player2);
+			cheese = findObject(Map.Cheese);
 			switch (gameMode)
 			{
 				case GameMode.Computer:
-					timer = true;
+					timerEnabled = true;
 					break;
 				case GameMode.Player:
 					update.Enabled = true;
 					update.Stop();
 					break;
 				case GameMode.PlayervsComputer:
-					timer = true;
+					timerEnabled = true;
 					break;
 				case GameMode.PlayervsPlayer:
 					update.Enabled = true;
@@ -381,35 +257,25 @@ namespace cheese_v2
 			modeSelect.SelectedIndex = 0;
 		}
 
+		private void startButton_Click(object sender, EventArgs e)
+		{
+			update.Start();
+			if (gameMode != GameMode.Computer)
+				keyboardEnabled = true;
+			startButton.Enabled = false;
+		}
 		private void resetButton_Click(object sender, EventArgs e)
 		{
 			resetGame();
-			mapSelect.SelectedIndex = 0;
-			modeSelect.SelectedIndex = 0;
 			mazeTable.Refresh();
 		}
 
 		private void mapSelect_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			selectMaze(mapSelect.SelectedIndex);
+			resetGame();
 			mazeTable.Refresh();
 		}
-		/*public void gameMode(int n)
-		{
-			mouse1 = findObject(3);
-			mouse2 = findObject(4);
-			if (n == 0)
-			{
-				mouse2.Id = 0;
-				mazeMap[mouse2.X, mouse2.Y] = 0;
-			}
-			else if (n == 1)
-			{
-				mouse1.Id = 0;
-				mazeMap[mouse1.X, mouse1.Y] = 0;
-				mazeTable.Refresh();
-			}
-		}*/
 
 		private void modeSelect_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -430,6 +296,81 @@ namespace cheese_v2
 			}
 			resetGame();
 			mazeTable.Refresh();
+		}
+		private void update_Tick(object sender, EventArgs e)
+		{
+			if (gameOver)
+				endGame();
+			else if (timerEnabled)
+			{
+				autoMove(mouse1);
+			}
+		}
+		private void Game_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (!gameOver && keyboardEnabled)
+			{
+				switch (e.KeyCode)
+				{
+					case Keys.W:
+						step(mouse2, Direction.Up);
+						break;
+					case Keys.S:
+						step(mouse2, Direction.Down);
+						break;
+					case Keys.A:
+						step(mouse2, Direction.Left);
+						break;
+					case Keys.D:
+						step(mouse2, Direction.Right);
+						break;
+					default:
+						break;
+				}
+				checkAround(mouse2);
+			}
+			else if (gameOver)
+				endGame();
+		}
+		private void mazeTable_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
+		{
+			for (int i = 0; i < 10; i++)
+			{
+				for (int j = 0; j < 15; j++)
+				{
+					if (e.Column == j && e.Row == i)
+					{
+						switch (mazeMap[i, j])
+						{
+							case 0:
+								e.Graphics.DrawImage(groundImage, e.CellBounds);
+								//e.Graphics.DrawString(steps[i, j].ToString(), new Font("Arial", 16), new SolidBrush(Color.Black), e.CellBounds);
+								break;
+							case 1:
+								e.Graphics.DrawImage(wallImage, e.CellBounds);
+								break;
+							case 2:
+								e.Graphics.DrawImage(cheeseImage, e.CellBounds);
+								break;
+							case 3:
+								e.Graphics.DrawImage(mouseImage1, e.CellBounds);
+								break;
+							case 4:
+								e.Graphics.DrawImage(mouseImage2, e.CellBounds);
+								break;
+						}
+					}
+				}
+			}
+		}
+		public static void SetDoubleBuffered(Control c)
+		{
+			if (SystemInformation.TerminalServerSession)
+				return;
+			System.Reflection.PropertyInfo aProp = typeof(Control).GetProperty("DoubleBuffered",
+			System.Reflection.BindingFlags.NonPublic |
+			System.Reflection.BindingFlags.Instance);
+			aProp.SetValue(c, true, null);
 		}
 	}
 }
