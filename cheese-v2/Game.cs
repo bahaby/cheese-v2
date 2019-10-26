@@ -25,6 +25,14 @@ namespace cheese_v2
 		PlayervsComputer,
 		PlayervsPlayer
 	}
+	public enum Map
+	{
+		Road,
+		Wall,
+		Cheese,
+		Player1,
+		Player2
+	}
 	public partial class Game : Form
 	{
 		Image mouseImage1 = Image.FromFile("..\\..\\img\\mouse1.jpg");
@@ -34,9 +42,9 @@ namespace cheese_v2
 		Image cheeseImage = Image.FromFile("..\\..\\img\\cheese.jpg");
 
 		// 2-) cheese 3-) 1. mouse 4-) 2. mouse
-		Object cheese = new Object(2);
-		Object mouse1 = new Object(3);
-		Object mouse2 = new Object(4);
+		Object cheese = new Object(Map.Cheese);
+		Object mouse1 = new Object(Map.Player1);
+		Object mouse2 = new Object(Map.Player2);
 		Direction[] directions = { Direction.Up, Direction.Down, Direction.Left, Direction.Right };
 		GameMode gameMode = GameMode.Player;
 		bool gameOver;
@@ -48,7 +56,7 @@ namespace cheese_v2
 			this.KeyPreview = true;
 			gameOver = false;
 			selectMaze(0);
-			cheese = findUniqueObject(2);
+			cheese = findObject(Map.Cheese);
 		}
 
 		int[,] steps = new int[10, 15];
@@ -99,7 +107,8 @@ namespace cheese_v2
 						{
 							case -1:
 							case 0:
-								e.Graphics.DrawImage(groundImage, e.CellBounds);
+								//e.Graphics.DrawImage(groundImage, e.CellBounds);
+								e.Graphics.DrawString(steps[i, j].ToString(), new Font("Arial", 16), new SolidBrush(Color.Black), e.CellBounds);
 								break;
 							case 1:
 								e.Graphics.DrawImage(wallImage, e.CellBounds);
@@ -118,14 +127,14 @@ namespace cheese_v2
 				}
 			}
 		}
-		private Object findUniqueObject(int mapItem)
+		private Object findObject(Map mapItem)
 		{
 			Object obj = new Object(mapItem);
 			for (int i = 0; i < 10; i++)
 			{
 				for (int j = 0; j < 15; j++)
 				{
-					if (mazeMap[i, j] == mapItem)
+					if ((Map)mazeMap[i, j] == mapItem)
 					{
 						obj.X = i;
 						obj.Y = j;
@@ -134,21 +143,20 @@ namespace cheese_v2
 			}
 			return obj;
 		}
-		private int checkDirection(Object mouse, Direction direction)
+		private Map checkDirection(Object mouse, Direction direction)
 		{
-
 			switch (direction)
 			{
 				case Direction.Up:
-					return mazeMap[mouse.X - 1, mouse.Y];
+					return (Map)mazeMap[mouse.X - 1, mouse.Y];
 				case Direction.Down:
-					return mazeMap[mouse.X + 1, mouse.Y];
+					return (Map)mazeMap[mouse.X + 1, mouse.Y];
 				case Direction.Left:
-					return mazeMap[mouse.X, mouse.Y - 1];
+					return (Map)mazeMap[mouse.X, mouse.Y - 1];
 				case Direction.Right:
-					return mazeMap[mouse.X, mouse.Y + 1];
+					return (Map)mazeMap[mouse.X, mouse.Y + 1];
 			}
-			return -1;
+			return Map.Road;
 		}
 		private int checkSteps(Object mouse, Direction direction)
 		{
@@ -165,22 +173,22 @@ namespace cheese_v2
 			}
 			return -1;
 		}
-		private int checkAround(Object mouse)
+		private Map checkAround(Object mouse)
 		{
-			int objectType = 0;
+			Map objectType = 0;
 			foreach (Direction direction in directions)
 			{
 				switch (checkDirection(mouse, direction))
 				{
-					case 2:
-						objectType = 2;
+					case Map.Cheese:
+						objectType = Map.Cheese;
 						gameOver = true;
 						break;
-					case 3:
-						objectType = 3;
+					case Map.Player1:
+						objectType = Map.Player1;
 						break;
-					case 4:
-						objectType = 4;
+					case Map.Player2:
+						objectType = Map.Player2;
 						break;
 				}
 			}
@@ -189,33 +197,43 @@ namespace cheese_v2
 		private Direction findDirection(Object mouse)
 		{
 			int lowestStep = 0;
-			Direction lowestDirection = Direction.None;
+			Direction bestDirection = Direction.None;
 			bool first = true;
+			Object temp = new Object(mouse.Id);
 
 			foreach (Direction direction in directions)
 			{
-				if (stepValidate(mouse, direction))
+				if (stepValidate(mouse, direction) && direction != mouse.BackDirection)
 				{
-					if (first)
+					temp.X = mouse.X;
+					temp.Y = mouse.Y;
+					while (stepValidate(temp, direction))
 					{
-						lowestStep = checkSteps(mouse, direction);
-						lowestDirection = direction;
+						if (first)
+						{
+							lowestStep = checkSteps(temp, direction);
+							bestDirection = direction;
+						}
+						if (lowestStep > checkSteps(temp, direction))
+						{
+							lowestStep = checkSteps(temp, direction);
+							bestDirection = direction;
+						}
+						temp.move(direction);
+						first = false;
 					}
-					if (lowestStep > checkSteps(mouse, direction))
-					{
-						lowestStep = checkSteps(mouse, direction);
-						lowestDirection = direction;
-					}
-					first = false;
+				}
+				if (direction == mouse.BackDirection && first == true)
+				{
+					bestDirection = mouse.BackDirection;
 				}
 			}
-			return lowestDirection;
+			return bestDirection;
 		}
 		private void autoMove(Object mouse)
 		{
 			step(mouse, findDirection(mouse));
 			checkAround(mouse);
-
 		}
 
 		/*private void keyboardMove(Object mouse)
@@ -227,36 +245,19 @@ namespace cheese_v2
 		}*/
 		private void step(Object mouse, Direction direction)
 		{
-			int newX = mouse.X, newY = mouse.Y;
 			if (!stepValidate(mouse, direction))
 				return;
-			switch (direction)
-			{
-				case Direction.Up:
-					newX -= 1;
-					break;
-				case Direction.Down:
-					newX += 1;
-					break;
-				case Direction.Left:
-					newY -= 1;
-					break;
-				case Direction.Right:
-					newY += 1;
-					break;
-			}
 			mazeMap[mouse.X, mouse.Y] = 0;
-			mazeMap[newX, newY] = mouse.Id;
-			steps[mouse.X, mouse.Y]++;
-			mouse.X = newX;
-			mouse.Y = newY;
-			mouse.StepCount++;
+			if (mouse.Id == Map.Player1)
+				steps[mouse.X, mouse.Y]++;
+			mouse.move(direction);
+			mazeMap[mouse.X, mouse.Y] = (int)mouse.Id;
 			mazeTable.Refresh();
 		}
 		private bool stepValidate(Object mouse, Direction direction)
 		{
-			int check = checkDirection(mouse, direction);
-			if (check == 1 || check == 3 || check == 4)
+			Map check = checkDirection(mouse, direction);
+			if (check == Map.Wall || check == Map.Player1 || check == Map.Player2)
 				return false;
 			return true;
 		}
@@ -266,11 +267,11 @@ namespace cheese_v2
 			if (gameMode != GameMode.Computer)
 				keyboard = true;
 		}
-		public static void SetDoubleBuffered(System.Windows.Forms.Control c)
+		public static void SetDoubleBuffered(Control c)
 		{
-			if (System.Windows.Forms.SystemInformation.TerminalServerSession)
+			if (SystemInformation.TerminalServerSession)
 				return;
-			System.Reflection.PropertyInfo aProp = typeof(System.Windows.Forms.Control).GetProperty("DoubleBuffered",
+			System.Reflection.PropertyInfo aProp = typeof(Control).GetProperty("DoubleBuffered",
 			System.Reflection.BindingFlags.NonPublic |
 			System.Reflection.BindingFlags.Instance);
 			aProp.SetValue(c, true, null);
@@ -302,11 +303,11 @@ namespace cheese_v2
 		}
 		private void endGame()
 		{
-			int check = checkAround(cheese);
+			Map check = checkAround(cheese);
 			string message="";
-			if (check == 3)
+			if (check == Map.Player1)
 				message = "kazanan computer " + mouse1.StepCount + " adımda bitirdi";
-			if (check == 4)
+			if (check == Map.Player2)
 				message = "kazanan player " + mouse2.StepCount + " adımda bitirdi";
 			resetGame();
 			MessageBox.Show(message);
@@ -354,8 +355,8 @@ namespace cheese_v2
 			gameOver = false;
 			keyboard = false;
 			timer = false;
-			mouse1 = findUniqueObject(3);
-			mouse2 = findUniqueObject(4);
+			mouse1 = findObject(Map.Player1);
+			mouse2 = findObject(Map.Player2);
 			switch (gameMode)
 			{
 				case GameMode.Computer:
@@ -395,8 +396,8 @@ namespace cheese_v2
 		}
 		/*public void gameMode(int n)
 		{
-			mouse1 = findUniqueObject(3);
-			mouse2 = findUniqueObject(4);
+			mouse1 = findObject(3);
+			mouse2 = findObject(4);
 			if (n == 0)
 			{
 				mouse2.Id = 0;

@@ -11,11 +11,36 @@ namespace cheese_v2
 		public int X { get; set; }
 		public int Y { get; set; }
 		public int StepCount { get; set; }
-		public Object(int id)
+		public Direction BackDirection { get; set; }
+		public Object(Map id)
 		{
 			this.Id = id;
 		}
-		public int Id { get; set; }
+		public Map Id { get; set; }
+		public void move(Direction direction)
+		{
+			this.StepCount++;
+			switch (direction)
+			{
+				case Direction.Up:
+					BackDirection = Direction.Down;
+					this.X -= 1;
+					break;
+				case Direction.Down:
+					BackDirection = Direction.Up;
+					this.X += 1;
+					break;
+				case Direction.Left:
+					BackDirection = Direction.Right;
+					this.Y -= 1;
+					break;
+				case Direction.Right:
+					BackDirection = Direction.Left;
+					this.Y += 1;
+					break;
+			}
+
+		}
 
 	}
 }
