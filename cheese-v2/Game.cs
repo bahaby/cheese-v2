@@ -326,7 +326,6 @@ namespace cheese_v2
 			else if (gameOver)
 				endGame();
 		}
-		//kareleri doldurma
 		private void mazeTable_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
 		{
 			for (int i = 0; i < 10; i++)
