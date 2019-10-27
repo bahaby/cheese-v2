@@ -114,24 +114,23 @@ namespace cheese_v2
 		}
 		private Map checkAround(Object mouse)
 		{
-			Map objectType = Map.Road;
 			foreach (Direction direction in directions)
 			{
 				switch ((Map)mouse.check(mazeMap, direction))
 				{
 					case Map.Cheese:
-						objectType = Map.Cheese;
 						gameOver = true;
+						return Map.Cheese;
 						break;
 					case Map.Player1:
-						objectType = Map.Player1;
+						return Map.Player1;
 						break;
 					case Map.Player2:
-						objectType = Map.Player2;
+						return Map.Player2;
 						break;
 				}
 			}
-			return objectType;
+			return Map.Road;
 		}
 		private Direction findDirection(Object mouse)
 		{
@@ -169,11 +168,6 @@ namespace cheese_v2
 			}
 			return bestDirection;
 		}
-		private void autoMove(Object mouse)
-		{
-			step(mouse, findDirection(mouse));
-			checkAround(mouse);
-		}
 
 		private void step(Object mouse, Direction direction)
 		{
@@ -185,6 +179,7 @@ namespace cheese_v2
 			mouse.move(direction);
 			mazeMap[mouse.X, mouse.Y] = (int)mouse.Id;
 			mazeTable.Refresh();
+			checkAround(mouse);
 		}
 		private bool stepValidate(Object mouse, Direction direction)
 		{
@@ -303,7 +298,7 @@ namespace cheese_v2
 				endGame();
 			else if (timerEnabled)
 			{
-				autoMove(mouse1);
+				step(mouse1, findDirection(mouse1));
 			}
 		}
 		private void Game_KeyDown(object sender, KeyEventArgs e)
@@ -327,7 +322,6 @@ namespace cheese_v2
 					default:
 						break;
 				}
-				checkAround(mouse2);
 			}
 			else if (gameOver)
 				endGame();
