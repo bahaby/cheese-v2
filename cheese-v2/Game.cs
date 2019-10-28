@@ -121,13 +121,10 @@ namespace cheese_v2
 					case Map.Cheese:
 						gameOver = true;
 						return Map.Cheese;
-						break;
 					case Map.Player1:
 						return Map.Player1;
-						break;
 					case Map.Player2:
 						return Map.Player2;
-						break;
 				}
 			}
 			return Map.Road;
