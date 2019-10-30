@@ -21,8 +21,8 @@ namespace cheese_v2
 	//oyun modları
 	public enum GameMode
 	{
-		Player,
 		Computer,
+		Player,
 		PlayervsComputer,
 		PlayervsPlayer
 	}
@@ -32,8 +32,8 @@ namespace cheese_v2
 		Road,
 		Wall,
 		Cheese,
-		Player1,
-		Player2
+		Computer,
+		Player
 	}
 	public partial class Game : Form
 	{
@@ -46,8 +46,8 @@ namespace cheese_v2
 		
 
 		Object cheese = new Object(Map.Cheese);
-		Object mouse1 = new Object(Map.Player1);
-		Object mouse2 = new Object(Map.Player2);
+		Object mouseComputer = new Object(Map.Computer);
+		Object mousePlayer = new Object(Map.Player);
 		Direction[] directions = { Direction.Up, Direction.Down, Direction.Left, Direction.Right };
 		GameMode gameMode = GameMode.Player;
 		bool gameOver = false;
@@ -121,10 +121,10 @@ namespace cheese_v2
 					case Map.Cheese:
 						gameOver = true;
 						return Map.Cheese;
-					case Map.Player1:
-						return Map.Player1;
-					case Map.Player2:
-						return Map.Player2;
+					case Map.Computer:
+						return Map.Computer;
+					case Map.Player:
+						return Map.Player;
 				}
 			}
 			return Map.Road;
@@ -171,7 +171,7 @@ namespace cheese_v2
 			if (!stepValidate(mouse, direction))
 				return;
 			mazeMap[mouse.X, mouse.Y] = 0;
-			if (mouse.Id == Map.Player1)
+			if (mouse.Id == Map.Computer)
 				steps[mouse.X, mouse.Y]++;
 			mouse.move(direction);
 			mazeMap[mouse.X, mouse.Y] = (int)mouse.Id;
@@ -181,7 +181,7 @@ namespace cheese_v2
 		private bool stepValidate(Object mouse, Direction direction)
 		{
 			Map check = (Map)mouse.check(mazeMap, direction);
-			if (check == Map.Wall || check == Map.Player1 || check == Map.Player2)
+			if (check == Map.Wall || check == Map.Computer || check == Map.Player)
 				return false;
 			return true;
 		}
@@ -204,10 +204,10 @@ namespace cheese_v2
 		{
 			Map check = checkAround(cheese);
 			string message="";
-			if (check == Map.Player1)
-				message = "kazanan computer " + mouse1.StepCount + " adımda bitirdi";
-			if (check == Map.Player2)
-				message = "kazanan player " + mouse2.StepCount + " adımda bitirdi";
+			if (check == Map.Computer)
+				message = "kazanan computer " + mouseComputer.StepCount + " adımda bitirdi";
+			if (check == Map.Player)
+				message = "kazanan player " + mousePlayer.StepCount + " adımda bitirdi";
 			resetGame();
 			startButton.Enabled = false;
 			MessageBox.Show(message);
@@ -222,8 +222,8 @@ namespace cheese_v2
 			gameOver = false;
 			keyboardEnabled = false;
 			timerEnabled = false;
-			mouse1 = findObject(Map.Player1);
-			mouse2 = findObject(Map.Player2);
+			mouseComputer = findObject(Map.Computer);
+			mousePlayer = findObject(Map.Player);
 			cheese = findObject(Map.Cheese);
 			switch (gameMode)
 			{
@@ -295,7 +295,7 @@ namespace cheese_v2
 				endGame();
 			else if (timerEnabled)
 			{
-				step(mouse1, findDirection(mouse1));
+				step(mouseComputer, findDirection(mouseComputer));
 			}
 		}
 		private void Game_KeyDown(object sender, KeyEventArgs e)
@@ -305,16 +305,16 @@ namespace cheese_v2
 				switch (e.KeyCode)
 				{
 					case Keys.W:
-						step(mouse2, Direction.Up);
+						step(mousePlayer, Direction.Up);
 						break;
 					case Keys.S:
-						step(mouse2, Direction.Down);
+						step(mousePlayer, Direction.Down);
 						break;
 					case Keys.A:
-						step(mouse2, Direction.Left);
+						step(mousePlayer, Direction.Left);
 						break;
 					case Keys.D:
-						step(mouse2, Direction.Right);
+						step(mousePlayer, Direction.Right);
 						break;
 					default:
 						break;
