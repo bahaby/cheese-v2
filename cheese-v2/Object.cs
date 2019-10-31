@@ -14,29 +14,30 @@ namespace cheese_v2
 		public Direction BackDirection { get; set; }
 		public Object(Map id)
 		{
-			this.Id = id;
+			Id = id;
+
 		}
 		public Map Id { get; set; }
 		public void move(Direction direction)
 		{
-			this.StepCount++;
+			StepCount++;
 			switch (direction)
 			{
 				case Direction.Up:
 					BackDirection = Direction.Down;
-					this.X -= 1;
+					X -= 1;
 					break;
 				case Direction.Down:
 					BackDirection = Direction.Up;
-					this.X += 1;
+					X += 1;
 					break;
 				case Direction.Left:
 					BackDirection = Direction.Right;
-					this.Y -= 1;
+					Y -= 1;
 					break;
 				case Direction.Right:
 					BackDirection = Direction.Left;
-					this.Y += 1;
+					Y += 1;
 					break;
 			}
 
@@ -46,13 +47,13 @@ namespace cheese_v2
 			switch (direction)
 			{
 				case Direction.Up:
-					return array[this.X - 1, this.Y];
+					return array[X - 1, Y];
 				case Direction.Down:
-					return array[this.X + 1, this.Y];
+					return array[X + 1, Y];
 				case Direction.Left:
-					return array[this.X, this.Y - 1];
+					return array[X, Y - 1];
 				case Direction.Right:
-					return array[this.X, this.Y + 1];
+					return array[X, Y + 1];
 			}
 			return 0;
 		}
