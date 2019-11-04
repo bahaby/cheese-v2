@@ -146,33 +146,39 @@ namespace cheese_v2
 		}
 		private Direction findDirection(Object mouse)
 		{
-			int lowestStep = 0;
+			float lowestAverage = 999999, average;
+			int highestCount = 0, count;
 			Direction bestDirection = Direction.None;
 			bool first = true;
 			Object temp = new Object(mouse.Id);
-			foreach (Direction direction in directions)
+			var mixedDirection = directions.OrderBy(a => Guid.NewGuid()).ToList();
+			foreach (Direction direction in mixedDirection)
 			{
 				if (stepValidate(mouse, direction) && direction != mouse.BackDirection)
 				{
+					average = 0;
 					temp.X = mouse.X;
 					temp.Y = mouse.Y;
-					while (stepValidate(temp, direction))
+					for (count = 0; stepValidate(temp, direction); count++)
 					{
-						if (first)
-						{
-							lowestStep = temp.check(steps, direction);
-							bestDirection = direction;
-						}
-						else if (lowestStep > temp.check(steps, direction))
-						{
-							lowestStep = temp.check(steps, direction);
-							bestDirection = direction;
-						}
+						average += temp.check(steps, direction);
 						temp.move(direction);
 						first = false;
 					}
+					average /= count;
+					show.Text = average + " " + direction;
+					if (average < lowestAverage && !first)
+					{
+						lowestAverage = average;
+						bestDirection = direction;
+					}
+					if (average == lowestAverage && count > highestCount && !first)
+					{
+						highestCount = count;
+						bestDirection = direction;
+					}
 				}
-				if (direction == mouse.BackDirection && first == true)
+				if (direction == mouse.BackDirection && first)
 				{
 					bestDirection = mouse.BackDirection;
 				}
@@ -348,8 +354,8 @@ namespace cheese_v2
 						switch (mazeMap[i, j])
 						{
 							case 0:
-								e.Graphics.DrawImage(groundImage, e.CellBounds);
-								//e.Graphics.DrawString(steps[i, j].ToString(), new Font("Arial", 16), new SolidBrush(Color.Black), e.CellBounds);
+								//e.Graphics.DrawImage(groundImage, e.CellBounds);
+								e.Graphics.DrawString(steps[i, j].ToString(), new Font("Arial", 16), new SolidBrush(Color.Black), e.CellBounds);
 								break;
 							case 1:
 								e.Graphics.DrawImage(wallImage, e.CellBounds);

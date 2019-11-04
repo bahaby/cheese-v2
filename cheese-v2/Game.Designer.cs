@@ -35,6 +35,7 @@
 			this.modeSelect = new System.Windows.Forms.ComboBox();
 			this.mazeTable = new System.Windows.Forms.TableLayoutPanel();
 			this.update = new System.Windows.Forms.Timer(this.components);
+			this.show = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// startButton
@@ -154,13 +155,23 @@
 			// 
 			// update
 			// 
+			this.update.Interval = 50;
 			this.update.Tick += new System.EventHandler(this.update_Tick);
+			// 
+			// show
+			// 
+			this.show.Location = new System.Drawing.Point(547, 653);
+			this.show.Name = "show";
+			this.show.Size = new System.Drawing.Size(100, 23);
+			this.show.TabIndex = 3;
+			this.show.Text = "average";
 			// 
 			// Game
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(975, 689);
+			this.Controls.Add(this.show);
 			this.Controls.Add(this.modeSelect);
 			this.Controls.Add(this.mapSelect);
 			this.Controls.Add(this.resetButton);
@@ -182,6 +193,7 @@
 		private System.Windows.Forms.ComboBox modeSelect;
 		private System.Windows.Forms.TableLayoutPanel mazeTable;
 		private System.Windows.Forms.Timer update;
+		private System.Windows.Forms.Label show;
 	}
 }
 
