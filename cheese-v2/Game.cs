@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Quobject.SocketIoClientDotNet.Client;
 
 namespace cheese_v2
 {
@@ -56,20 +57,19 @@ namespace cheese_v2
 		{
 			InitializeComponent();
 			SetDoubleBuffered(mazeTable); // dalgalanma sorunu için
-			this.KeyPreview = true;
 			selectMaze(0);
 		}
 		
 		int[,,] mazeMaps = { {
 				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-				{ 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 4, 1, 0, 0, 0, 1, 0, 1},
+				{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 4, 1, 0, 0, 0, 1, 0, 1},
 				{ 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1},
 				{ 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1},
 				{ 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1},
 				{ 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1},
 				{ 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1},
 				{ 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1},
-				{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
+				{ 1, 0, 0, 0, 0, 1, 0, 0, 2, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
 				{ 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1},
 				{ 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1},
 				{ 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1},
@@ -127,6 +127,7 @@ namespace cheese_v2
 			}
 			return obj;
 		}
+		//ayar lazım
 		private Map checkAround(Object mouse)
 		{
 			foreach (Direction direction in directions)
@@ -136,6 +137,12 @@ namespace cheese_v2
 					case Map.Cheese:
 						gameOver = true;
 						return Map.Cheese;
+				}
+			}
+			foreach (Direction direction in directions)
+			{
+				switch ((Map)mouse.check(mazeMap, direction))
+				{
 					case Map.Computer:
 						return Map.Computer;
 					case Map.Player:
@@ -151,8 +158,8 @@ namespace cheese_v2
 			Direction bestDirection = Direction.None;
 			bool first = true;
 			Object temp = new Object(mouse.Id);
-			var mixedDirection = directions.OrderBy(a => Guid.NewGuid()).ToList();
-			foreach (Direction direction in mixedDirection)
+			//var mixedDirection = directions.OrderBy(a => Guid.NewGuid()).ToList();
+			foreach (Direction direction in directions)
 			{
 				if (stepValidate(mouse, direction) && direction != mouse.BackDirection)
 				{
@@ -166,7 +173,6 @@ namespace cheese_v2
 						first = false;
 					}
 					average /= count;
-					show.Text = average + " " + direction;
 					if (average < lowestAverage && !first)
 					{
 						lowestAverage = average;
@@ -267,6 +273,7 @@ namespace cheese_v2
 		{
 			mapSelect.SelectedIndex = 0;
 			modeSelect.SelectedIndex = 0;
+
 		}
 
 		private void startButton_Click(object sender, EventArgs e)
@@ -354,8 +361,8 @@ namespace cheese_v2
 						switch (mazeMap[i, j])
 						{
 							case 0:
-								//e.Graphics.DrawImage(groundImage, e.CellBounds);
-								e.Graphics.DrawString(steps[i, j].ToString(), new Font("Arial", 16), new SolidBrush(Color.Black), e.CellBounds);
+								e.Graphics.DrawImage(groundImage, e.CellBounds);
+								//e.Graphics.DrawString(steps[i, j].ToString(), new Font("Arial", 16), new SolidBrush(Color.Black), e.CellBounds);
 								break;
 							case 1:
 								e.Graphics.DrawImage(wallImage, e.CellBounds);
@@ -374,6 +381,15 @@ namespace cheese_v2
 				}
 			}
 		}
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+			CreateMap createMap = new CreateMap();
+			this.Hide();
+			createMap.ShowDialog();
+			this.Show();
+		}
+
 		public static void SetDoubleBuffered(Control c)
 		{
 			if (SystemInformation.TerminalServerSession)
