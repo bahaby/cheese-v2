@@ -65,12 +65,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CreateMap.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CreateMap.Designer.cs">
-      <DependentUpon>CreateMap.cs</DependentUpon>
-    </Compile>
     <Compile Include="Game.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -80,14 +74,11 @@
     <Compile Include="Object.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="CreateMap.resx">
-      <DependentUpon>CreateMap.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Game.resx">
       <DependentUpon>Game.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -96,6 +87,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="maps.json" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\Object.datasource" />
     <None Include="Properties\Settings.settings">
@@ -128,6 +120,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="img\wall.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\maps.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

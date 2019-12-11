@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Quobject.SocketIoClientDotNet.Client;
 
 namespace cheese_v2
@@ -24,8 +28,7 @@ namespace cheese_v2
 	{
 		Computer,
 		Player,
-		PlayervsComputer,
-		PlayervsPlayer
+		PlayervsComputer
 	}
 	//mazeMap dizisindeki int değerlere karşılık gelecek terimler
 	public enum Map
@@ -53,62 +56,17 @@ namespace cheese_v2
 		GameMode gameMode = GameMode.Player;
 		bool gameOver = false;
 		bool timerEnabled = false, keyboardEnabled = false;
+
 		public Game()
 		{
 			InitializeComponent();
 			SetDoubleBuffered(mazeTable); // dalgalanma sorunu için
+			string json = File.ReadAllText(@"..\\..\\maps.json");
+			mazeMaps = JsonConvert.DeserializeObject<int[,,]>(json);
 			selectMaze(0);
 		}
-		
-		int[,,] mazeMaps = { {
-				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-				{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 4, 1, 0, 0, 0, 1, 0, 1},
-				{ 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-				{ 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1},
-				{ 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1},
-				{ 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1},
-				{ 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-				{ 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1},
-				{ 1, 0, 0, 0, 0, 1, 0, 0, 2, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
-				{ 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1},
-				{ 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1},
-				{ 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1},
-				{ 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1},
-				{ 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 3, 1},
-				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-			},{
-				{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-				{1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1 },
-				{1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1 },
-				{1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 3, 1, 0, 0, 1 },
-				{1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1 },
-				{1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1 },
-				{1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1 },
-				{1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1 },
-				{1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1 },
-				{1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1 },
-				{1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1 },
-				{1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1 },
-				{1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1 },
-				{1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 4, 1 },
-				{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
-			},{
-				{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-				{1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1 },
-				{1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1 },
-				{1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1 },
-				{1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1 },
-				{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1 },
-				{1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1 },
-				{1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1 },
-				{1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1 },
-				{1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1 },
-				{1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1 },
-				{1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1 },
-				{1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1 },
-				{1, 3, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1 },
-				{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
-			} };
+
+		int[,,] mazeMaps;
 		int[,] mazeMap = new int[15, 24];
 		int[,] steps = new int[15, 24];
 		private Object findObject(Map mapItem)
@@ -211,6 +169,7 @@ namespace cheese_v2
 				return false;
 			return true;
 		}
+
 		private void selectMaze(int n)
 		{
 			for (int i = 0; i < 15; i++)
@@ -263,16 +222,17 @@ namespace cheese_v2
 				case GameMode.PlayervsComputer:
 					timerEnabled = true;
 					break;
-				case GameMode.PlayervsPlayer:
-					update.Enabled = true;
-					update.Stop();
-					break;
 			}
 		}
 		private void Game_Load(object sender, EventArgs e)
 		{
 			mapSelect.SelectedIndex = 0;
 			modeSelect.SelectedIndex = 0;
+
+/*
+			string output = Newtonsoft.Json.JsonConvert.SerializeObject(mazeMaps, Formatting.Indented);
+			File.WriteAllText(@"..\\..\\maps.json", output);*/
+
 
 		}
 
@@ -308,9 +268,6 @@ namespace cheese_v2
 					break;
 				case 2:
 					gameMode = GameMode.PlayervsComputer;
-					break;
-				case 3:
-					gameMode = GameMode.PlayervsPlayer;
 					break;
 			}
 			resetGame();
@@ -382,12 +339,8 @@ namespace cheese_v2
 			}
 		}
 
-		private void button1_Click(object sender, EventArgs e)
+		private void Game_Leave(object sender, EventArgs e)
 		{
-			CreateMap createMap = new CreateMap();
-			this.Hide();
-			createMap.ShowDialog();
-			this.Show();
 		}
 
 		public static void SetDoubleBuffered(Control c)
