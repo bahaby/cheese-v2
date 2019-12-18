@@ -12,12 +12,11 @@ namespace cheese_v2
 		public int Y { get; set; }
 		public int StepCount { get; set; }
 		public Direction BackDirection { get; set; }
+		public Map Id { get; set; }
 		public Object(Map id)
 		{
-			Id = id;
-
+			this.Id = id;
 		}
-		public Map Id { get; set; }
 		public void move(Direction direction)
 		{
 			StepCount++;

@@ -35,6 +35,8 @@
 			this.modeSelect = new System.Windows.Forms.ComboBox();
 			this.mazeTable = new System.Windows.Forms.TableLayoutPanel();
 			this.update = new System.Windows.Forms.Timer(this.components);
+			this.txtIP = new System.Windows.Forms.TextBox();
+			this.lblIP = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// startButton
@@ -90,7 +92,8 @@
 			this.modeSelect.Items.AddRange(new object[] {
             "player",
             "computer",
-            "player vs computer"});
+            "player vs computer",
+            "network"});
 			this.modeSelect.Location = new System.Drawing.Point(207, 653);
 			this.modeSelect.Margin = new System.Windows.Forms.Padding(0);
 			this.modeSelect.Name = "modeSelect";
@@ -156,11 +159,31 @@
 			this.update.Interval = 50;
 			this.update.Tick += new System.EventHandler(this.update_Tick);
 			// 
+			// txtIP
+			// 
+			this.txtIP.Location = new System.Drawing.Point(501, 657);
+			this.txtIP.Name = "txtIP";
+			this.txtIP.Size = new System.Drawing.Size(138, 20);
+			this.txtIP.TabIndex = 3;
+			this.txtIP.Visible = false;
+			// 
+			// lblIP
+			// 
+			this.lblIP.AutoSize = true;
+			this.lblIP.Location = new System.Drawing.Point(446, 660);
+			this.lblIP.Name = "lblIP";
+			this.lblIP.Size = new System.Drawing.Size(49, 13);
+			this.lblIP.TabIndex = 4;
+			this.lblIP.Text = "server IP";
+			this.lblIP.Visible = false;
+			// 
 			// Game
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(991, 710);
+			this.Controls.Add(this.lblIP);
+			this.Controls.Add(this.txtIP);
 			this.Controls.Add(this.modeSelect);
 			this.Controls.Add(this.mapSelect);
 			this.Controls.Add(this.resetButton);
@@ -174,6 +197,7 @@
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Game_KeyDown);
 			this.Leave += new System.EventHandler(this.Game_Leave);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
@@ -184,6 +208,8 @@
 		private System.Windows.Forms.ComboBox modeSelect;
 		private System.Windows.Forms.TableLayoutPanel mazeTable;
 		private System.Windows.Forms.Timer update;
+		private System.Windows.Forms.TextBox txtIP;
+		private System.Windows.Forms.Label lblIP;
 	}
 }
 

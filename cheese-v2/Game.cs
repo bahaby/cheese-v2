@@ -28,7 +28,8 @@ namespace cheese_v2
 	{
 		Computer,
 		Player,
-		PlayervsComputer
+		PlayervsComputer,
+		Network
 	}
 	//mazeMap dizisindeki int değerlere karşılık gelecek terimler
 	public enum Map
@@ -194,6 +195,8 @@ namespace cheese_v2
 			if (check == Map.Player)
 				message = "kazanan player " + mousePlayer.StepCount + " adımda bitirdi";
 			resetGame();
+			mapSelect.Enabled = false;
+			modeSelect.Enabled = false;
 			startButton.Enabled = false;
 			MessageBox.Show(message);
 		}
@@ -203,6 +206,8 @@ namespace cheese_v2
 			update.Stop();
 			selectMaze(mapSelect.SelectedIndex);
 			startButton.Enabled = true;
+			mapSelect.Enabled = true;
+			modeSelect.Enabled = true;
 			steps = new int[15, 24];
 			gameOver = false;
 			keyboardEnabled = false;
@@ -214,13 +219,23 @@ namespace cheese_v2
 			{
 				case GameMode.Computer:
 					timerEnabled = true;
+					txtIP.Visible = false;
+					lblIP.Visible = false;
 					break;
 				case GameMode.Player:
 					update.Enabled = true;
 					update.Stop();
+					txtIP.Visible = false;
+					lblIP.Visible = false;
 					break;
 				case GameMode.PlayervsComputer:
 					timerEnabled = true;
+					txtIP.Visible = false;
+					lblIP.Visible = false;
+					break;
+				case GameMode.Network:
+					txtIP.Visible = true;
+					lblIP.Visible = true;
 					break;
 			}
 		}
@@ -242,6 +257,8 @@ namespace cheese_v2
 			if (gameMode != GameMode.Computer)
 				keyboardEnabled = true;
 			startButton.Enabled = false;
+			mapSelect.Enabled = false;
+			modeSelect.Enabled = false;
 		}
 		private void resetButton_Click(object sender, EventArgs e)
 		{
@@ -268,6 +285,9 @@ namespace cheese_v2
 					break;
 				case 2:
 					gameMode = GameMode.PlayervsComputer;
+					break;
+				case 3:
+					gameMode = GameMode.Network;
 					break;
 			}
 			resetGame();
